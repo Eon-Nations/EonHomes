@@ -20,6 +20,12 @@ public final class EonHomes extends JavaPlugin {
         setupListeners();
     }
 
+    @Override
+    public void onDisable() {
+        Homes homes = new Homes();
+        homes.saveConfig();
+    }
+
     private void setupHomeFile() {
         Homes homes = new Homes();
         homes.setupFile();

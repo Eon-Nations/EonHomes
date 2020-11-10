@@ -1,0 +1,17 @@
+name: EonHomes
+version: ${project.version}
+main: me.squid.eonhomes.EonHomes
+api-version: 1.16
+prefix: EonHomes
+authors: [Squid]
+softdepend: [AsyncWorldManager]
+description: Homes for Eon Survival
+commands:
+  home:
+    description: Go to your home lol
+  sethome:
+    description: Set the home lol
+  delhome:
+    description: Delte home lol
+  homes:
+    description: List homes

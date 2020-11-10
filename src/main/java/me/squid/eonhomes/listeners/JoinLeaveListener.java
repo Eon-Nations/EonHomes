@@ -20,6 +20,8 @@ public class JoinLeaveListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Homes homes = new Homes();
-        homes.getConfig().createSection("Homes." + e.getPlayer().getUniqueId());
+        if (homes.getConfig().getConfigurationSection("Homes." + e.getPlayer().getUniqueId().toString()) == null) {
+            homes.getConfig().createSection("Homes." + e.getPlayer().getUniqueId());
+        }
     }
 }

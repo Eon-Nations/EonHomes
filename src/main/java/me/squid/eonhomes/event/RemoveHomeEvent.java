@@ -10,26 +10,16 @@ public class RemoveHomeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     private Player p;
-    private Home home;
     private String name;
 
-    public RemoveHomeEvent(Player p, Home home, String name) {
+    public RemoveHomeEvent(Player p, String name) {
         super(true);
         this.p = p;
-        this.home = home;
         this.name = name;
     }
 
     public Player getPlayer() {
         return p;
-    }
-
-    public Home getHome() {
-        return home;
-    }
-
-    public void setHome(Home home) {
-        this.home = home;
     }
 
     public String getName() {

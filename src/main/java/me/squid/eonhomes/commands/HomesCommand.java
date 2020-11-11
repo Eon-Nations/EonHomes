@@ -15,6 +15,7 @@ import java.util.Set;
 public class HomesCommand implements CommandExecutor {
 
     EonHomes plugin;
+    List<Home> homes;
 
     public HomesCommand(EonHomes plugin) {
         this.plugin = plugin;
@@ -27,11 +28,16 @@ public class HomesCommand implements CommandExecutor {
 
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            Set<String> list = HomeManager.getHomes(p);
 
+            if (!HomeManager.isInMap(p)) {
+                p.sendMessage(Utils.chat(EonHomes.prefix + "&7No homes found."));
+                return true;
+            }
+            homes = HomeManager.getHomes(p);
             p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes:"));
-            for (String home : list) {
-                p.sendMessage(Utils.chat("&7   - " + home));
+
+            for (Home home : homes) {
+                p.sendMessage(Utils.chat("&7 - " + home.getName()));
             }
         }
 

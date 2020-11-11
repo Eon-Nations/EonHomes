@@ -6,8 +6,10 @@ import me.squid.eonhomes.commands.HomesCommand;
 import me.squid.eonhomes.commands.SetHomeCommand;
 import me.squid.eonhomes.files.Homes;
 import me.squid.eonhomes.listeners.HomeChangeListener;
-import me.squid.eonhomes.listeners.JoinLeaveListener;
+import me.squid.eonhomes.utils.HomeManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
 
 public final class EonHomes extends JavaPlugin {
 
@@ -15,6 +17,7 @@ public final class EonHomes extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        loadHomesFile();
         setupHomeFile();
         setupCommands();
         setupListeners();
@@ -22,8 +25,11 @@ public final class EonHomes extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Homes homes = new Homes();
-        homes.saveConfig();
+        try {
+            HomeManager.saveMapToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupHomeFile() {
@@ -42,6 +48,13 @@ public final class EonHomes extends JavaPlugin {
 
     private void setupListeners() {
         new HomeChangeListener(this);
-        new JoinLeaveListener(this);
+    }
+
+    private void loadHomesFile() {
+        try {
+            HomeManager.loadMapFromFile();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -13,11 +13,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class HomeChangeListener implements Listener {
 
     EonHomes plugin;
-    Homes homes = new Homes();
+    List<Home> homes;
 
     public HomeChangeListener(EonHomes plugin) {
         this.plugin = plugin;
@@ -27,22 +28,35 @@ public class HomeChangeListener implements Listener {
     @EventHandler
     public void onHomeAdd(NewHomeEvent e) {
         if (canMakeNewHome(e.getPlayer())) {
-            Home home = new Home(e.getLocation(), e.getPlayer(), e.getName());
+            Home home = new Home(e.getLocation().serialize(), e.getPlayer().getUniqueId(), e.getName());
             HomeManager.addHome(home);
             Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home set")));
-        } else e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Not enough homes available. Rankup for more"));
+        } else e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Not enough homes available. Rankup for more."));
     }
 
     private boolean canMakeNewHome(Player p) {
         if (p.hasPermission("eonhomes.amount.unlimited")) return true;
-        int amount = homes.getConfig().getInt("Homes." + p.getUniqueId().toString() + ".amount");
-        return amount < getMaxAmountOfHomes(p);
+        return HomeManager.getHomes(p).size() < getMaxAmountOfHomes(p);
     }
 
     @EventHandler
     public void onHomeRemove(RemoveHomeEvent e) {
-        HomeManager.removeHome(e.getHome());
-        Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home removed")));
+        boolean exit = false;
+        try {
+            homes = HomeManager.getHomes(e.getPlayer());
+        } catch (NullPointerException exception) {
+            e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7No homes found to delete."));
+            exit = true;
+        }
+        if (!exit) {
+            String name = e.getName();
+            for (Home home : homes) {
+                if (home.getName().equalsIgnoreCase(name)) HomeManager.removeHome(home);
+                Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home removed")));
+                return;
+            }
+            Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home not found")));
+        }
     }
 
     private int getMaxAmountOfHomes(Player p) {

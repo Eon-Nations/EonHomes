@@ -3,24 +3,28 @@ package me.squid.eonhomes;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class Home {
+import java.io.Serializable;
+import java.util.Map;
+import java.util.UUID;
 
-    private Location location;
-    private Player owner;
-    private String name;
+public class Home implements Serializable {
 
-    public Home(Location location, Player owner, String name) {
+    private final Map<String, Object> location;
+    private final UUID uuid;
+    private final String name;
+
+    public Home(Map<String, Object> location, UUID uuid, String name) {
         this.location = location;
-        this.owner = owner;
+        this.uuid = uuid;
         this.name = name;
     }
 
     public Location getLocation() {
-        return location;
+        return Location.deserialize(location);
     }
 
-    public Player getOwner() {
-        return owner;
+    public UUID getUUID() {
+        return uuid;
     }
 
     public String getName() {

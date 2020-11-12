@@ -18,7 +18,6 @@ public class HomeManager {
     private static HashMap<UUID, ArrayList<Home>> homeMap = new HashMap<>();
 
     public static void addHome(Home home) {
-        Player p = Bukkit.getPlayer(home.getUUID());
 
         ArrayList<Home> homes;
         if (homeMap.containsKey(home.getUUID())) {
@@ -26,16 +25,15 @@ public class HomeManager {
         } else homes = new ArrayList<>();
 
         homes.add(home);
-        homeMap.put(p.getUniqueId(), homes);
+        homeMap.put(home.getUUID(), homes);
     }
 
     public static void removeHome(Home home) {
-        Player p = Bukkit.getPlayer(home.getUUID());
 
-        if (homeMap.containsKey(p.getUniqueId())) {
-            ArrayList<Home> homes = homeMap.get(p.getUniqueId());
+        if (homeMap.containsKey(home.getUUID())) {
+            ArrayList<Home> homes = homeMap.get(home.getUUID());
             homes.remove(home);
-            homeMap.put(p.getUniqueId(), homes);
+            homeMap.put(home.getUUID(), homes);
         }
     }
 

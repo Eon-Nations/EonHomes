@@ -1,5 +1,6 @@
 package me.squid.eonhomes.listeners;
 
+import com.destroystokyo.paper.network.NetworkClient;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.Home;
 import me.squid.eonhomes.event.NewHomeEvent;
@@ -36,27 +37,23 @@ public class HomeChangeListener implements Listener {
 
     private boolean canMakeNewHome(Player p) {
         if (p.hasPermission("eonhomes.amount.unlimited")) return true;
-        return HomeManager.getHomes(p).size() < getMaxAmountOfHomes(p);
+        else return HomeManager.getHomes(p).size() < getMaxAmountOfHomes(p);
     }
 
     @EventHandler
     public void onHomeRemove(RemoveHomeEvent e) {
-        boolean exit = false;
-        try {
-            homes = HomeManager.getHomes(e.getPlayer());
-        } catch (NullPointerException exception) {
-            e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7No homes found to delete."));
-            exit = true;
-        }
-        if (!exit) {
-            String name = e.getName();
+        homes = HomeManager.getHomes(e.getPlayer());
+
+        if (homes != null) {
             for (Home home : homes) {
-                if (home.getName().equalsIgnoreCase(name)) HomeManager.removeHome(home);
-                Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home removed")));
-                return;
+                if (home.getName().equalsIgnoreCase(e.getName())){
+                    HomeManager.removeHome(home);
+                    Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home removed")));
+                    return;
+                }
             }
-            Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home not found")));
-        }
+            Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7Home not found.")));
+        } else Bukkit.getScheduler().runTask(plugin, () -> e.getPlayer().sendMessage(Utils.chat(EonHomes.prefix + "&7No homes found to remove")));
     }
 
     private int getMaxAmountOfHomes(Player p) {

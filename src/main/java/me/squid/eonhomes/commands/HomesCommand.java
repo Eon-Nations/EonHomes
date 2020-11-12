@@ -34,13 +34,25 @@ public class HomesCommand implements CommandExecutor {
                 return true;
             }
             homes = HomeManager.getHomes(p);
-            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes:"));
+            String[] homeArray = new String[homes.size()];
 
-            for (Home home : homes) {
-                p.sendMessage(Utils.chat("&7 - " + home.getName()));
+            for (int i = 0; i < homes.size(); i++) {
+                homeArray[i] = homes.get(i).getName();
             }
+            String hString = combineHomesTogether(homeArray);
+
+            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: " + hString));
         }
 
         return true;
+    }
+
+    private String combineHomesTogether(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        for (String arg : args) {
+            sb.append(arg).append(" ");
+        }
+        String allArgs = sb.toString().trim();
+        return Utils.chat(allArgs);
     }
 }

@@ -32,18 +32,18 @@ public class HomeCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (args.length == 1) {
-                try {
-                    home = HomeManager.getHome(p, args[0]);
-                } catch (NullPointerException e) {
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
-                    return true;
-                }
-
-                p.sendMessage(Utils.chat(EonHomes.prefix + "&7Teleporting to home in 3 seconds..."));
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    p.teleportAsync(home.getLocation());
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
-                }, 60L);
+                home = HomeManager.getHome(p, args[0]);
+                if (home != null) {
+                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Teleporting to home in 3 seconds..."));
+                    if (p.hasPermission("eonhomes.cooldown.bypass")) {
+                        p.teleportAsync(home.getLocation());
+                        p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
+                        return true;
+                    } else Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                            p.teleportAsync(home.getLocation());
+                            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
+                        }, 60L);
+                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
             } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /home <name>"));
         }
 

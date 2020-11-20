@@ -41,7 +41,7 @@ public class HomesCommand implements CommandExecutor {
             }
             String hString = combineHomesTogether(homeArray);
 
-            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: " + hString));
+            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
         }
 
         return true;
@@ -50,7 +50,7 @@ public class HomesCommand implements CommandExecutor {
     private String combineHomesTogether(String[] args) {
         StringBuilder sb = new StringBuilder();
         for (String arg : args) {
-            sb.append(arg).append(" ");
+            sb.append(arg).append(", ");
         }
         String allArgs = sb.toString().trim();
         return Utils.chat(allArgs);

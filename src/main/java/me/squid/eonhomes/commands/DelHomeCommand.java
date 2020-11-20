@@ -1,21 +1,13 @@
 package me.squid.eonhomes.commands;
 
 import me.squid.eonhomes.EonHomes;
-import me.squid.eonhomes.Home;
 import me.squid.eonhomes.event.RemoveHomeEvent;
-import me.squid.eonhomes.files.Homes;
-import me.squid.eonhomes.utils.HomeManager;
 import me.squid.eonhomes.utils.Utils;
-import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class DelHomeCommand implements CommandExecutor {
 

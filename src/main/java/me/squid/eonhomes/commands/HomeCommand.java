@@ -46,6 +46,13 @@ public class HomeCommand implements CommandExecutor {
                         }, 60L);
                     }
                 } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
+            } else if (args.length == 2 && p.hasPermission("eonhomes.commands.home.others")) {
+                Player target = Bukkit.getPlayer(args[0]);
+                if (target != null) {
+                    home = HomeManager.getHome(p, args[1]);
+                    if (home != null) p.teleportAsync(home.getLocation());
+                    else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
+                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Player does not exist."));
             } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /home <name>"));
         }
 

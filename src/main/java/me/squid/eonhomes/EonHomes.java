@@ -7,6 +7,7 @@ import me.squid.eonhomes.commands.SetHomeCommand;
 import me.squid.eonhomes.files.Homes;
 import me.squid.eonhomes.listeners.HomeChangeListener;
 import me.squid.eonhomes.utils.HomeManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;

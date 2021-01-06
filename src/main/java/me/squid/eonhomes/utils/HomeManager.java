@@ -49,6 +49,18 @@ public class HomeManager {
         return null;
     }
 
+    public static Home getHome(UUID uuid, String name) {
+        if (homeMap.containsKey(uuid)) {
+            ArrayList<Home> homes = homeMap.get(uuid);
+            for (Home home : homes) {
+                if (home.getName().equalsIgnoreCase(name)) {
+                    return home;
+                }
+            }
+        }
+        return null;
+    }
+
     public static ArrayList<Home> getHomes(Player p) {
         return homeMap.get(p.getUniqueId());
     }

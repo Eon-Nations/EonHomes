@@ -1,13 +1,12 @@
 package me.squid.eonhomes;
 
-import me.squid.eonhomes.commands.DelHomeCommand;
-import me.squid.eonhomes.commands.HomeCommand;
-import me.squid.eonhomes.commands.HomesCommand;
-import me.squid.eonhomes.commands.SetHomeCommand;
+import me.squid.eonhomes.commands.*;
 import me.squid.eonhomes.files.Homes;
 import me.squid.eonhomes.listeners.HomeChangeListener;
 import me.squid.eonhomes.utils.HomeManager;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -15,6 +14,7 @@ import java.io.IOException;
 public final class EonHomes extends JavaPlugin {
 
     public static final String prefix = "&7[&b&lEonHomes&7] ";
+    public static LuckPerms api;
 
     @Override
     public void onEnable() {
@@ -22,6 +22,7 @@ public final class EonHomes extends JavaPlugin {
         setupHomeFile();
         setupCommands();
         setupListeners();
+        setupLuckPerms();
     }
 
     @Override
@@ -45,6 +46,7 @@ public final class EonHomes extends JavaPlugin {
         new DelHomeCommand(this);
         new HomeCommand(this);
         new HomesCommand(this);
+        new GetGroupCommand(this);
     }
 
     private void setupListeners() {
@@ -57,5 +59,12 @@ public final class EonHomes extends JavaPlugin {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setupLuckPerms() {
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            api = provider.getProvider();
+        } else System.out.println("LuckPerms is returning null");
     }
 }

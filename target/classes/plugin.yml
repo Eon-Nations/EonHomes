@@ -15,3 +15,5 @@ commands:
     description: Delte home lol
   homes:
     description: List homes
+  getgroup:
+    description: Get group

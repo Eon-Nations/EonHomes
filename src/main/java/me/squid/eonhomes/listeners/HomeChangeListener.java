@@ -1,16 +1,19 @@
 package me.squid.eonhomes.listeners;
 
 import me.squid.eonhomes.EonHomes;
+import me.squid.eonhomes.utils.Group;
 import me.squid.eonhomes.Home;
 import me.squid.eonhomes.event.NewHomeEvent;
 import me.squid.eonhomes.event.RemoveHomeEvent;
 import me.squid.eonhomes.utils.HomeManager;
 import me.squid.eonhomes.utils.Utils;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class HomeChangeListener implements Listener {
@@ -40,7 +43,7 @@ public class HomeChangeListener implements Listener {
         } else {
             int currentAmount = HomeManager.getHomes(p).size();
             int maxAmount = getMaxAmountOfHomes(p);
-            return currentAmount <= maxAmount;
+            return currentAmount < maxAmount;
         }
     }
 
@@ -61,8 +64,14 @@ public class HomeChangeListener implements Listener {
     }
 
     private int getMaxAmountOfHomes(Player p) {
-        for (int i = 1; i < 31; i++) {
-            if (p.hasPermission("eonhomes.amount." + i)) return i;
+        LuckPerms api = EonHomes.api;
+        HashMap<Group, Integer> homeValues = Group.getHomeValues();
+
+        String pgroup = api.getUserManager().getUser(p.getUniqueId()).getPrimaryGroup();
+
+        for (Group g : Group.values()) {
+            Group group = Group.valueOf(pgroup.toUpperCase());
+            if (group.equals(g)) return homeValues.get(g);
         }
         return 1;
     }

@@ -1,11 +1,13 @@
 me/squid/eonhomes/Home.class
 me/squid/eonhomes/listeners/HomeChangeListener.class
 me/squid/eonhomes/files/Homes.class
+me/squid/eonhomes/commands/GetGroupCommand.class
 me/squid/eonhomes/EonHomes.class
 me/squid/eonhomes/commands/HomesCommand.class
 me/squid/eonhomes/utils/Utils.class
 me/squid/eonhomes/event/RemoveHomeEvent.class
 me/squid/eonhomes/commands/HomeCommand.class
+me/squid/eonhomes/utils/Group.class
 me/squid/eonhomes/event/NewHomeEvent.class
 me/squid/eonhomes/commands/SetHomeCommand.class
 me/squid/eonhomes/commands/DelHomeCommand.class

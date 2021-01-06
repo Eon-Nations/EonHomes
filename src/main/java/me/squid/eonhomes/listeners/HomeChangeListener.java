@@ -1,11 +1,9 @@
 package me.squid.eonhomes.listeners;
 
-import com.destroystokyo.paper.network.NetworkClient;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.Home;
 import me.squid.eonhomes.event.NewHomeEvent;
 import me.squid.eonhomes.event.RemoveHomeEvent;
-import me.squid.eonhomes.files.Homes;
 import me.squid.eonhomes.utils.HomeManager;
 import me.squid.eonhomes.utils.Utils;
 import org.bukkit.Bukkit;
@@ -13,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class HomeChangeListener implements Listener {
@@ -36,8 +33,15 @@ public class HomeChangeListener implements Listener {
     }
 
     private boolean canMakeNewHome(Player p) {
-        if (p.hasPermission("eonhomes.amount.unlimited")) return true;
-        else return HomeManager.getHomes(p).size() < getMaxAmountOfHomes(p);
+        if (!HomeManager.isInMap(p)) HomeManager.addPlayerToMap(p);
+
+        if (p.hasPermission("eonhomes.amount.unlimited")) {
+            return true;
+        } else {
+            int currentAmount = HomeManager.getHomes(p).size();
+            int maxAmount = getMaxAmountOfHomes(p);
+            return currentAmount <= maxAmount;
+        }
     }
 
     @EventHandler
@@ -60,6 +64,6 @@ public class HomeChangeListener implements Listener {
         for (int i = 1; i < 31; i++) {
             if (p.hasPermission("eonhomes.amount." + i)) return i;
         }
-        return 3;
+        return 1;
     }
 }

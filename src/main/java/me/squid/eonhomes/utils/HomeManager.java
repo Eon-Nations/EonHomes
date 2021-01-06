@@ -57,6 +57,10 @@ public class HomeManager {
         return homeMap.containsKey(p.getUniqueId());
     }
 
+    public static void addPlayerToMap(Player p) {
+        homeMap.put(p.getUniqueId(), new ArrayList<>());
+    }
+
     public static World getWorld(String w) {
         boolean loop = true;
         int index = 0;

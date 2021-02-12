@@ -1,6 +1,5 @@
 package me.squid.eonhomes.event;
 
-import me.squid.eonhomes.Home;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

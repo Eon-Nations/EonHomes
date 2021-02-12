@@ -1,4 +1,4 @@
-package me.squid.eonhomes;
+package me.squid.eonhomes.utils;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

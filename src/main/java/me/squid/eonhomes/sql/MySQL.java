@@ -37,9 +37,12 @@ public class MySQL {
         if (isConnected()) {
             try {
                 connection.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+                connection = null;
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } catch (NullPointerException e) {}
+        } else {
+            connection = null;
         }
     }
 

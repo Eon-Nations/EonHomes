@@ -1,7 +1,7 @@
 name: EonHomes
 version: 1.0
 main: me.squid.eonhomes.EonHomes
-api-version: 1.16
+api-version: 1.17
 prefix: EonHomes
 authors: [Squid]
 softdepend: [AsyncWorldManager]
@@ -17,3 +17,6 @@ commands:
     description: List homes
   getgroup:
     description: Get group
+  breakhomes:
+    description: That simple
+    permission: eonhomes.commands.breakhomes

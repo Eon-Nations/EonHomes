@@ -10,7 +10,8 @@ public enum Group {
     SPACEMAN,
     ASTRONAUT,
     ALIEN,
-    GAMER
+    GAMER,
+    BUILDER
     ;
     private static final HashMap<Group, Integer> homeValues = new HashMap<>();
 
@@ -23,6 +24,7 @@ public enum Group {
         homeValues.put(ASTRONAUT, 15);
         homeValues.put(ALIEN, 25);
         homeValues.put(GAMER, 40);
+        homeValues.put(BUILDER, 100);
         return homeValues;
     }
 }

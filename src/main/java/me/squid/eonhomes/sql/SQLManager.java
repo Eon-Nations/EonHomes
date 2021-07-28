@@ -5,10 +5,7 @@ import me.squid.eonhomes.utils.Home;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,8 +49,14 @@ public class SQLManager {
                 ps.setFloat(9, home.getLocation().getYaw());
                 ps.executeUpdate();
             }
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -64,8 +67,14 @@ public class SQLManager {
             ps.setString(1, uuid.toString());
             ps.setString(2, name);
             ps.executeUpdate();
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -92,8 +101,14 @@ public class SQLManager {
             }
             Location loc = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
             return new Home(loc.serialize(), uuid, name);
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -110,8 +125,14 @@ public class SQLManager {
                 String name = rs.getString("HOMENAME");
                 homes.add(name);
             }
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
         return homes;
     }
@@ -127,8 +148,14 @@ public class SQLManager {
             while (rs.next()) {
                 homes.add(rs.getString("HOMENAME"));
             }
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
         return homes;
     }
@@ -141,10 +168,16 @@ public class SQLManager {
             ps.setString(2, name);
             ResultSet resultSet = ps.executeQuery();
             return resultSet.next();
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
         }
-        return false;
+        return true;
     }
 
     public int getAmountOfHomes(UUID uuid) {
@@ -159,9 +192,31 @@ public class SQLManager {
             while (rs.next()) {
                 count++;
             }
+        } catch (NullPointerException e) {
+            Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e instanceof SQLNonTransientConnectionException) {
+                Bukkit.getScheduler().runTaskAsynchronously(EonHomes.getPlugin(EonHomes.class), reconnectToDatabase());
+            } else {
+                e.printStackTrace();
+            }
+            return 0;
         }
         return count;
+    }
+
+    private Runnable reconnectToDatabase() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                MySQL sql = EonHomes.sql;
+                sql.disconnect();
+                try {
+                    sql.connectToDatabase();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 }

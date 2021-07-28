@@ -35,6 +35,7 @@ public final class EonHomes extends JavaPlugin {
         new DelHomeCommand(this);
         new HomeCommand(this);
         new HomesCommand(this);
+        new CloseConnectionCommand(this);
     }
 
     private void setupLuckPerms() {

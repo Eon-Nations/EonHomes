@@ -3,6 +3,7 @@ package me.squid.eonhomes.commands;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.sql.SQLManager;
 import me.squid.eonhomes.utils.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,8 +29,13 @@ public class HomesCommand implements CommandExecutor {
             Player p = (Player) sender;
             if (args.length == 0) {
                 List<String> homes = sqlManager.getHomes(p.getUniqueId());
-                String hString = getFormattedString(homes);
-                p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
+                if (homes.size() == 0)
+                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7If you have homes, try again in a minute. " +
+                            "If you don't, set a home with /sethome and your homes will show up here"));
+                else {
+                    String hString = getFormattedString(homes);
+                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
+                }
             } else if (args.length == 1 && p.hasPermission("eonhomes.homes.others")) {
                 try {
                     List<String> homes = sqlManager.getHomes(args[0]);

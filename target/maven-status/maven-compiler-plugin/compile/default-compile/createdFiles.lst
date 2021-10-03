@@ -1,8 +1,8 @@
 me/squid/eonhomes/utils/Home.class
 me/squid/eonhomes/sql/SQLManager.class
 me/squid/eonhomes/commands/CloseConnectionCommand.class
-me/squid/eonhomes/sql/SQLManager$1.class
 me/squid/eonhomes/EonHomes.class
+me/squid/eonhomes/sql/SQLManager$1.class
 me/squid/eonhomes/commands/HomesCommand.class
 me/squid/eonhomes/utils/Utils.class
 me/squid/eonhomes/event/RemoveHomeEvent.class

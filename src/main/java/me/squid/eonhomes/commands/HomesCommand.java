@@ -46,8 +46,9 @@ public class HomesCommand implements CommandExecutor {
 
     private String getFormattedString(List<String> args) {
         StringBuilder sb = new StringBuilder();
-        for (String arg : args) {
-            sb.append(arg).append(", ");
+        for (int i = 0; i < args.size(); i++) {
+            if (i == 0) sb.append(args.get(i));
+            else sb.append(", ").append(args.get(i));
         }
         String allArgs = sb.toString().trim();
         return Utils.chat(allArgs);

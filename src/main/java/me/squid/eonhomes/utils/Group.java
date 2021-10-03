@@ -7,9 +7,9 @@ public enum Group {
     TRAVELER,
     EXPLORER,
     RANGER,
-    SPACEMAN,
-    ASTRONAUT,
-    ALIEN,
+    HERO,
+    LEGEND,
+    MYTHIC,
     GAMER,
     BUILDER
     ;
@@ -17,12 +17,12 @@ public enum Group {
 
     public static HashMap<Group, Integer> getHomeValues() {
         homeValues.put(DEFAULT, 1);
-        homeValues.put(TRAVELER, 3);
-        homeValues.put(EXPLORER, 5);
-        homeValues.put(RANGER, 7);
-        homeValues.put(SPACEMAN, 9);
-        homeValues.put(ASTRONAUT, 15);
-        homeValues.put(ALIEN, 25);
+        homeValues.put(TRAVELER, 2);
+        homeValues.put(EXPLORER, 3);
+        homeValues.put(RANGER, 5);
+        homeValues.put(HERO, 7);
+        homeValues.put(LEGEND, 9);
+        homeValues.put(MYTHIC, 15);
         homeValues.put(GAMER, 40);
         homeValues.put(BUILDER, 100);
         return homeValues;

@@ -29,9 +29,11 @@ public class HomesCommand implements CommandExecutor {
             Player p = (Player) sender;
             if (args.length == 0) {
                 List<String> homes = sqlManager.getHomes(p.getUniqueId());
-                if (homes.size() == 0)
+                if (homes.size() == 0) {
                     p.sendMessage(Utils.chat(EonHomes.prefix + "&7If you have homes, try again in a minute. " +
                             "If you don't, set a home with /sethome and your homes will show up here"));
+                    return true;
+                }
                 else {
                     String hString = getFormattedString(homes);
                     p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));

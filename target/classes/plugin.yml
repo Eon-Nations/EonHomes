@@ -12,11 +12,6 @@ commands:
   sethome:
     description: Set the home lol
   delhome:
-    description: Delte home lol
+    description: Delete home lol
   homes:
     description: List homes
-  getgroup:
-    description: Get group
-  breakhomes:
-    description: That simple
-    permission: eonhomes.commands.breakhomes

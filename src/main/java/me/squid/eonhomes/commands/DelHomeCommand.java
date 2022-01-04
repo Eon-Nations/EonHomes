@@ -1,35 +1,56 @@
 package me.squid.eonhomes.commands;
 
 import me.squid.eonhomes.EonHomes;
-import me.squid.eonhomes.sql.SQLManager;
+import me.squid.eonhomes.event.RemoveHomeEvent;
+import me.squid.eonhomes.managers.HomeManager;
 import me.squid.eonhomes.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-public class DelHomeCommand implements CommandExecutor {
+import java.util.concurrent.CompletableFuture;
+
+public class DelHomeCommand implements CommandExecutor, Listener {
 
     EonHomes plugin;
+    HomeManager homeManager;
 
-    public DelHomeCommand(EonHomes plugin) {
+    public DelHomeCommand(EonHomes plugin, HomeManager homeManager) {
         this.plugin = plugin;
         plugin.getCommand("delhome").setExecutor(this);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        SQLManager sqlManager = new SQLManager();
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
+        if (sender instanceof Player p) {
             if (args.length == 1) {
-                if (sqlManager.getHome(p.getUniqueId(), args[0]) != null) {
-                    sqlManager.removeHome(p.getUniqueId(), args[0]);
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home removed"));
-                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home not found."));
+                Bukkit.getScheduler().runTaskAsynchronously(plugin,
+                        () -> Bukkit.getPluginManager().callEvent(new RemoveHomeEvent(p, args[0])));
             } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /delhome <home>"));
         }
         return true;
+    }
+
+    @EventHandler
+    public void onRemoveHomeEventTrigger(RemoveHomeEvent e) {
+        Player p = e.getPlayer();
+        CompletableFuture<Boolean> homeFuture = homeManager.homeExists(p.getUniqueId(), e.getName());
+        homeFuture.thenAcceptAsync(exists -> {
+            if (exists) {
+                homeManager.removeHome(p.getUniqueId(), e.getName());
+                sendMessage(p, "Home removed");
+            } else sendMessage(p, "Home not found");
+        });
+    }
+
+    private void sendMessage(Player player, String message) {
+        Bukkit.getScheduler().runTask(plugin,
+                () -> player.sendMessage(Utils.chat(EonHomes.prefix + "&7" + message)));
     }
 }

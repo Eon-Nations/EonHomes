@@ -1,66 +1,80 @@
 package me.squid.eonhomes.commands;
 
 import me.squid.eonhomes.EonHomes;
-import me.squid.eonhomes.sql.SQLManager;
-import me.squid.eonhomes.utils.Home;
-import me.squid.eonhomes.utils.Group;
+import me.squid.eonhomes.event.NewHomeEvent;
+import me.squid.eonhomes.managers.Home;
+import me.squid.eonhomes.managers.HomeManager;
 import me.squid.eonhomes.utils.Utils;
 import net.luckperms.api.LuckPerms;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
-public class SetHomeCommand implements CommandExecutor {
+public class SetHomeCommand implements CommandExecutor, Listener {
 
     EonHomes plugin;
-
-    public SetHomeCommand(EonHomes plugin) {
+    HomeManager homeManager;
+    LuckPerms luckPerms;
+    
+    public SetHomeCommand(EonHomes plugin, HomeManager homeManager, LuckPerms luckPerms) {
         this.plugin = plugin;
+        this.homeManager = homeManager;
+        this.luckPerms = luckPerms;
         plugin.getCommand("sethome").setExecutor(this);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        SQLManager sqlManager = new SQLManager();
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (sender instanceof Player p) {
+            // Just in case the location changes by the time the home is created.
+            Location homeLocation = p.getLocation();
             if (args.length == 1) {
-                if (canMakeNewHome(p, sqlManager)) {
-                    Home home = new Home(p.getLocation().serialize(), p.getUniqueId(), args[0]);
-                    sqlManager.addHome(home);
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home set"));
-                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Not enough homes available. Rankup for more."));
+                if (args[0].length() > 15) {
+                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7The maximum length for a name is 15 characters. Please try again."));
+                    return true;
+                }
+                Bukkit.getScheduler().runTaskAsynchronously(plugin,
+                        () -> Bukkit.getPluginManager().callEvent(new NewHomeEvent(p, homeLocation, args[0])));
             } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /sethome <home>"));
         }
-
-        System.out.println("Sethome command has been executed");
         return true;
     }
 
-    private boolean canMakeNewHome(Player p, SQLManager sqlManager) {
+    @EventHandler
+    public void onHomeCreateEvent(NewHomeEvent e) {
+        Player p = e.getPlayer();
+        if (canMakeNewHome(p)) {
+            Home home = new Home(e.getLocation(), p.getUniqueId(), e.getName());
+            homeManager.addHome(home);
+            sendMessage(p, "Home set");
+        } else sendMessage(p, "Not enough homes available. Rankup for more.");
+    }
+
+    private boolean canMakeNewHome(Player p) {
         if (p.hasPermission("eonhomes.amount.unlimited")) {
             return true;
         } else {
-            int currentAmount = sqlManager.getAmountOfHomes(p.getUniqueId());
-            int maxAmount = getMaxAmountOfHomes(p);
-            return currentAmount < maxAmount;
+            CompletableFuture<Long> currentAmountFuture = homeManager.getAmountOfHomes(p.getUniqueId());
+            CompletableFuture<Boolean> boolFuture = currentAmountFuture.thenApplyAsync(currentAmount -> {
+                int maxAmount = homeManager.getMaxAmountOfHomes(p);
+                return currentAmount < maxAmount;
+            });
+            return boolFuture.join();
         }
     }
 
-    private int getMaxAmountOfHomes(Player p) {
-        LuckPerms api = EonHomes.api;
-        HashMap<Group, Integer> homeValues = Group.getHomeValues();
-
-        String pgroup = api.getUserManager().getUser(p.getUniqueId()).getPrimaryGroup();
-
-        for (Group g : Group.values()) {
-            Group group = Group.valueOf(pgroup.toUpperCase());
-            if (group.equals(g)) return homeValues.get(g);
-        }
-        return 1;
+    private void sendMessage(Player player, String message) {
+        Bukkit.getScheduler().runTask(plugin,
+                () -> player.sendMessage(Utils.chat(EonHomes.prefix + "&7" + message)));
     }
 }

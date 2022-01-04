@@ -1,55 +1,73 @@
 package me.squid.eonhomes.commands;
 
 import me.squid.eonhomes.EonHomes;
-import me.squid.eonhomes.sql.SQLManager;
-import me.squid.eonhomes.utils.Home;
+import me.squid.eonhomes.event.QueryHomeEvent;
+import me.squid.eonhomes.managers.HomeManager;
+import me.squid.eonhomes.managers.Home;
 import me.squid.eonhomes.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-public class HomeCommand implements CommandExecutor {
+import java.util.concurrent.CompletableFuture;
+
+public class HomeCommand implements CommandExecutor, Listener {
 
     EonHomes plugin;
+    HomeManager homeManager;
 
-    public HomeCommand(EonHomes plugin) {
+    public HomeCommand(EonHomes plugin, HomeManager homeManager) {
         this.plugin = plugin;
+        this.homeManager = homeManager;
         plugin.getCommand("home").setExecutor(this);
     }
 
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        SQLManager sqlManager = new SQLManager();
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
+        if (sender instanceof Player p) {
             if (args.length == 1) {
-                Home home = sqlManager.getHome(p.getUniqueId(), args[0]);
-                if (home != null) {
-                    if (p.hasPermission("eonhomes.cooldown.bypass")) {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin,
+                        () -> Bukkit.getPluginManager().callEvent(new QueryHomeEvent(p.getUniqueId(), args[0])));
+            } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /home <name>"));
+        }
+
+        return true;
+    }
+
+    @EventHandler
+    public void onQueryHomeEvent(QueryHomeEvent e) {
+        CompletableFuture<Boolean> boolFuture = homeManager.homeExists(e.getUUID(), e.getName());
+        CompletableFuture<Home> homeFuture = boolFuture.thenApplyAsync(homeExists -> {
+            if (homeExists) {
+                return homeManager.getHome(e.getUUID(), e.getName());
+            } else return null;
+        });
+        homeFuture.thenAcceptAsync(home -> {
+            Player p = Bukkit.getPlayer(e.getUUID());
+            if (home != null) {
+                if (p != null && p.isOnline()) {
+                    if (p.isOp()) {
                         p.teleportAsync(home.getLocation());
-                        p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
+                        sendMessage(p, "Successfully teleported to " + home.getName());
                     } else {
-                        p.sendMessage(Utils.chat(EonHomes.prefix + "&7Teleporting in 3 seconds..."));
+                        sendMessage(p, "Teleporting in 3 seconds...");
                         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                             p.teleportAsync(home.getLocation());
                             p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
                         }, 60L);
                     }
-                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
-            } else if (args.length == 2 && p.hasPermission("eonhomes.commands.home.others")) {
-                Player target = Bukkit.getPlayer(args[0]);
-                if (target != null) {
-                    Home home = sqlManager.getHome(target.getUniqueId(), args[1]);
-                    if (home != null) p.teleportAsync(home.getLocation());
-                    else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Home is invalid"));
-                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Player does not exist."));
-            } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /home <name>"));
-        }
+                }
+            } else if (p != null && p.isOnline()) sendMessage(p, "Home is invalid");
+        });
+    }
 
-        return true;
+    private void sendMessage(Player player, String message) {
+        Bukkit.getScheduler().runTask(plugin,
+                () -> player.sendMessage(Utils.chat(EonHomes.prefix + "&7" + message)));
     }
 }

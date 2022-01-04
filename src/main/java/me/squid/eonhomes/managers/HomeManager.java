@@ -3,9 +3,7 @@ package me.squid.eonhomes.managers;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.utils.Group;
 import net.luckperms.api.LuckPerms;
-import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.MetaNode;
 import org.bukkit.Bukkit;
@@ -37,8 +35,7 @@ public class HomeManager {
 
     public void removeHome(UUID uuid, String name) {
         luckPerms.getUserManager().modifyUser(uuid, user -> {
-            Node toRemove = Node.builder("home:" + name).build();
-            user.data().remove(toRemove);
+            user.data().clear(NodeType.META.predicate(mn -> mn.getMetaKey().equals("home:" + name)));
         });
     }
 
@@ -48,21 +45,19 @@ public class HomeManager {
             MetaNode node = user.getNodes(NodeType.META).stream()
                     .filter(mn -> mn.getMetaKey().equals("home:" + name))
                     .findFirst().orElseThrow();
-            plugin.getLogger().info("Node MetaValue: " + node.getMetaValue());
             return fromHomeString(uuid, node.getMetaValue());
         });
         return homeFuture.join();
     }
 
-    public List<String> getHomes(UUID uuid) {
-        List<String> homeList = new ArrayList<>();
-        luckPerms.getUserManager().loadUser(uuid).thenAcceptAsync(user -> {
+    public CompletableFuture<List<String>> getHomes(UUID uuid) {
+        return luckPerms.getUserManager().loadUser(uuid).thenApplyAsync(user -> {
+            List<String> homes = new ArrayList<>();
             Collection<MetaNode> nodeList = user.getNodes(NodeType.META);
-            nodeList.forEach(node -> plugin.getLogger().info("Node: " + node.getMetaKey()));
             nodeList.stream().filter(node -> node.getMetaKey().split(":")[0].equals("home"))
-                    .forEach(node -> homeList.add(node.getMetaKey().split(":")[1]));
+                    .forEach(node -> homes.add(node.getMetaKey().split(":")[1]));
+            return homes;
         });
-        return homeList;
     }
 
     public CompletableFuture<Boolean> homeExists(UUID uuid, String name) {

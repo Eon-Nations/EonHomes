@@ -3,14 +3,13 @@ package me.squid.eonhomes.commands;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.managers.HomeManager;
 import me.squid.eonhomes.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class HomesCommand implements CommandExecutor {
 
@@ -29,15 +28,16 @@ public class HomesCommand implements CommandExecutor {
 
         if (sender instanceof Player p) {
             if (args.length == 0) {
-                List<String> homes = homeManager.getHomes(p.getUniqueId());
-                if (homes.size() == 0) {
-                    p.sendMessage(Utils.chat(EonHomes.prefix +
-                            "&7Looks like you don't have any homes. Do /sethome <name> to make a home."));
-                    return true;
-                } else {
-                    String hString = getFormattedString(homes);
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
-                }
+                CompletableFuture<List<String>> homesFuture = homeManager.getHomes(p.getUniqueId());
+                homesFuture.thenAcceptAsync(homes -> {
+                    if (homes.size() == 0) {
+                        p.sendMessage(Utils.chat(EonHomes.prefix +
+                                "&7Looks like you don't have any homes. Do /sethome <name> to make a home."));
+                    } else {
+                        String hString = getFormattedString(homes);
+                        p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
+                    }
+                });
             }
         }
         return true;

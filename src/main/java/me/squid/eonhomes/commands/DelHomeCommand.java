@@ -21,6 +21,7 @@ public class DelHomeCommand implements CommandExecutor, Listener {
 
     public DelHomeCommand(EonHomes plugin, HomeManager homeManager) {
         this.plugin = plugin;
+        this.homeManager = homeManager;
         plugin.getCommand("delhome").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }

@@ -47,10 +47,10 @@ public class HomeManager {
     public Home getHome(UUID uuid, String name) {
         CompletableFuture<Home> homeFuture = luckPerms.getUserManager().loadUser(uuid).thenApplyAsync(user -> {
             List<MetaNode> metaNodes = new ArrayList<>();
-            user.data().toCollection().stream()
-                    .filter(node -> node.getType().equals(NodeType.META))
-                    .forEach(node -> metaNodes.add((MetaNode) node));
-            MetaNode node = metaNodes.stream().findFirst().orElseThrow();
+            MetaNode node = user.getNodes(NodeType.META).stream()
+                    .filter(mn -> mn.getMetaKey().equals("home:" + name))
+                    .findFirst().orElseThrow();
+            plugin.getLogger().info("Node MetaValue: " + node.getMetaValue());
             return fromHomeString(uuid, node.getMetaValue());
         });
         return homeFuture.join();
@@ -59,23 +59,24 @@ public class HomeManager {
     public List<String> getHomes(UUID uuid) {
         List<String> homeList = new ArrayList<>();
         luckPerms.getUserManager().loadUser(uuid).thenAcceptAsync(user -> {
-            Collection<Node> nodeList = user.getNodes();
-            nodeList.stream().filter(node -> node.getKey().contains("home"))
-                    .forEach(node -> homeList.add(node.getKey().split(":")[1]));
+            plugin.getLogger().info("getHomes() actually made it here.");
+            Collection<MetaNode> nodeList = user.getNodes(NodeType.META);
+            nodeList.stream().filter(node -> node.getMetaKey().contains("home"))
+                    .forEach(node -> homeList.add(node.getMetaKey().split(":")[1]));
         });
         return homeList;
     }
 
     public CompletableFuture<Boolean> homeExists(UUID uuid, String name) {
         return luckPerms.getUserManager().loadUser(uuid)
-                .thenApplyAsync(user -> user.data().toCollection().stream()
-                        .anyMatch(node -> node.getKey().equals("home:" + name)));
+                .thenApplyAsync(user -> user.getNodes(NodeType.META).stream()
+                        .anyMatch(node -> node.getMetaKey().equals("home:" + name)));
     }
 
     public CompletableFuture<Long> getAmountOfHomes(UUID uuid) {
         return luckPerms.getUserManager().loadUser(uuid).thenApplyAsync(user ->
-                user.data().toCollection().stream()
-                .filter(node -> node.getKey().contains("home"))
+                user.getNodes(NodeType.META).stream()
+                .filter(node -> node.getMetaKey().contains("home"))
                 .count());
     }
 

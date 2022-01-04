@@ -24,6 +24,7 @@ public class HomeCommand implements CommandExecutor, Listener {
         this.plugin = plugin;
         this.homeManager = homeManager;
         plugin.getCommand("home").setExecutor(this);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
 

@@ -27,8 +27,7 @@ public class HomesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
+        if (sender instanceof Player p) {
             if (args.length == 0) {
                 List<String> homes = homeManager.getHomes(p.getUniqueId());
                 if (homes.size() == 0) {
@@ -38,15 +37,6 @@ public class HomesCommand implements CommandExecutor {
                 } else {
                     String hString = getFormattedString(homes);
                     p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
-                }
-            } else if (args.length == 1 && p.hasPermission("eonhomes.homes.others")) {
-                OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[0]);
-                try {
-                    List<String> homes = homeManager.getHomes(target.getUniqueId());
-                    String hString = getFormattedString(homes);
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
-                } catch (NullPointerException e) {
-                    p.sendMessage(Utils.chat(EonHomes.prefix + "&7Invalid target"));
                 }
             }
         }

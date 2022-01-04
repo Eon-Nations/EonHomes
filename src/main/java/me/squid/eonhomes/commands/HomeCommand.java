@@ -48,23 +48,22 @@ public class HomeCommand implements CommandExecutor, Listener {
                 return homeManager.getHome(e.getUUID(), e.getName());
             } else return null;
         });
-        homeFuture.thenAcceptAsync(home -> {
-            Player p = Bukkit.getPlayer(e.getUUID());
-            if (home != null) {
-                if (p != null && p.isOnline()) {
-                    if (p.isOp()) {
+        Home home = homeFuture.join();
+        Player p = Bukkit.getPlayer(e.getUUID());
+        if (home != null) {
+            if (p != null && p.isOnline()) {
+                if (p.isOp()) {
+                    p.teleportAsync(home.getLocation());
+                    sendMessage(p, "Successfully teleported to " + home.getName());
+                } else {
+                    sendMessage(p, "Teleporting in 3 seconds...");
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                         p.teleportAsync(home.getLocation());
-                        sendMessage(p, "Successfully teleported to " + home.getName());
-                    } else {
-                        sendMessage(p, "Teleporting in 3 seconds...");
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                            p.teleportAsync(home.getLocation());
-                            p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
-                        }, 60L);
-                    }
+                        p.sendMessage(Utils.chat(EonHomes.prefix + "&7Successfully teleported to " + home.getName()));
+                    }, 60L);
                 }
-            } else if (p != null && p.isOnline()) sendMessage(p, "Home is invalid");
-        });
+            }
+        } else if (p != null && p.isOnline()) sendMessage(p, "Home is invalid");
     }
 
     private void sendMessage(Player player, String message) {

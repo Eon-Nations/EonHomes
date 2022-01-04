@@ -59,8 +59,8 @@ public class HomeManager {
     public List<String> getHomes(UUID uuid) {
         List<String> homeList = new ArrayList<>();
         luckPerms.getUserManager().loadUser(uuid).thenAcceptAsync(user -> {
-            plugin.getLogger().info("getHomes() actually made it here.");
             Collection<MetaNode> nodeList = user.getNodes(NodeType.META);
+            nodeList.forEach(node -> plugin.getLogger().info("Node: " + node.getMetaKey()));
             nodeList.stream().filter(node -> node.getMetaKey().contains("home"))
                     .forEach(node -> homeList.add(node.getMetaKey().split(":")[1]));
         });

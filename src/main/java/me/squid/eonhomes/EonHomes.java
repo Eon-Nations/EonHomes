@@ -15,8 +15,8 @@ public final class EonHomes extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        setupCommands();
         setupLuckPerms();
+        setupCommands();
     }
 
     private void setupCommands() {

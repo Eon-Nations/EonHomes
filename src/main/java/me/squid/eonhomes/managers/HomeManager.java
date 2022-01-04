@@ -12,11 +12,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class HomeManager {
 
@@ -61,7 +59,7 @@ public class HomeManager {
         luckPerms.getUserManager().loadUser(uuid).thenAcceptAsync(user -> {
             Collection<MetaNode> nodeList = user.getNodes(NodeType.META);
             nodeList.forEach(node -> plugin.getLogger().info("Node: " + node.getMetaKey()));
-            nodeList.stream().filter(node -> node.getMetaKey().contains("home"))
+            nodeList.stream().filter(node -> node.getMetaKey().split(":")[0].equals("home"))
                     .forEach(node -> homeList.add(node.getMetaKey().split(":")[1]));
         });
         return homeList;

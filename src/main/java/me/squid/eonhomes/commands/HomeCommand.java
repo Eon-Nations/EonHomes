@@ -53,7 +53,7 @@ public class HomeCommand implements CommandExecutor, Listener {
         if (home != null) {
             if (p != null && p.isOnline()) {
                 if (p.isOp()) {
-                    p.teleportAsync(home.getLocation());
+                    Bukkit.getScheduler().runTask(plugin, () -> p.teleportAsync(home.getLocation()));
                     sendMessage(p, "Successfully teleported to " + home.getName());
                 } else {
                     sendMessage(p, "Teleporting in 3 seconds...");

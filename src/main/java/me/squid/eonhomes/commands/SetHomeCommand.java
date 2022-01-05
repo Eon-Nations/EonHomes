@@ -65,11 +65,9 @@ public class SetHomeCommand implements CommandExecutor, Listener {
             return true;
         } else {
             CompletableFuture<Long> currentAmountFuture = homeManager.getAmountOfHomes(p.getUniqueId());
-            CompletableFuture<Boolean> boolFuture = currentAmountFuture.thenApplyAsync(currentAmount -> {
-                int maxAmount = homeManager.getMaxAmountOfHomes(p);
-                return currentAmount < maxAmount;
-            });
-            return boolFuture.join();
+            long currentAmount = currentAmountFuture.join();
+            int maxAmount = homeManager.getMaxAmountOfHomes(p);
+            return currentAmount < maxAmount;
         }
     }
 

@@ -2,7 +2,6 @@ package me.squid.eonhomes;
 
 import me.squid.eonhomes.commands.*;
 import me.squid.eonhomes.managers.HomeManager;
-import me.squid.eonhomes.utils.PublicServiceAnnouncement;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -26,7 +25,6 @@ public final class EonHomes extends JavaPlugin {
         new DelHomeCommand(this, homeManager);
         new HomeCommand(this, homeManager);
         new HomesCommand(this, homeManager);
-        new PublicServiceAnnouncement(this);
     }
 
     private void setupLuckPerms() {

@@ -9,17 +9,22 @@ public class QueryHomeEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    UUID uuid;
+    UUID target, sender;
     String name;
 
-    public QueryHomeEvent(UUID uuid, String name) {
+    public QueryHomeEvent(UUID target, UUID sender, String name) {
         super(true);
-        this.uuid = uuid;
+        this.target = target;
+        this.sender = sender;
         this.name = name;
     }
 
-    public UUID getUUID() {
-        return uuid;
+    public UUID getTarget() {
+        return target;
+    }
+
+    public UUID getSender() {
+        return sender;
     }
 
     public String getName() {

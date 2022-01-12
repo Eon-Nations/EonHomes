@@ -6,6 +6,7 @@ import me.squid.eonhomes.managers.HomeManager;
 import me.squid.eonhomes.managers.Home;
 import me.squid.eonhomes.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,23 +34,24 @@ public class HomeCommand implements CommandExecutor, Listener {
         if (sender instanceof Player p) {
             if (args.length == 1) {
                 Bukkit.getScheduler().runTaskAsynchronously(plugin,
-                        () -> Bukkit.getPluginManager().callEvent(new QueryHomeEvent(p.getUniqueId(), args[0])));
+                        () -> Bukkit.getPluginManager().callEvent(new QueryHomeEvent(p.getUniqueId(), p.getUniqueId(), args[0])));
+            } else if (args.length == 2 && p.hasPermission("eoncommands.home.bypass")) {
+                OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[0]);
+                if (target != null) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin,
+                            () -> Bukkit.getPluginManager().callEvent(
+                                    new QueryHomeEvent(target.getUniqueId(), p.getUniqueId(), args[1])));
+                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Player not found"));
             } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Usage: /home <name>"));
         }
-
         return true;
     }
 
     @EventHandler
     public void onQueryHomeEvent(QueryHomeEvent e) {
-        CompletableFuture<Boolean> boolFuture = homeManager.homeExists(e.getUUID(), e.getName());
-        CompletableFuture<Home> homeFuture = boolFuture.thenApplyAsync(homeExists -> {
-            if (homeExists) {
-                return homeManager.getHome(e.getUUID(), e.getName());
-            } else return null;
-        });
-        Home home = homeFuture.join();
-        Player p = Bukkit.getPlayer(e.getUUID());
+        boolean homeExists = homeManager.homeExists(e.getTarget(), e.getName()).join();
+        Home home = homeExists ? homeManager.getHome(e.getTarget(), e.getName()).join() : null;
+        Player p = Bukkit.getPlayer(e.getSender());
         if (home != null) {
             if (p != null && p.isOnline()) {
                 if (p.isOp()) {

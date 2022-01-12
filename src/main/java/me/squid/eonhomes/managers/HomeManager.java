@@ -39,15 +39,13 @@ public class HomeManager {
         });
     }
 
-    public Home getHome(UUID uuid, String name) {
-        CompletableFuture<Home> homeFuture = luckPerms.getUserManager().loadUser(uuid).thenApplyAsync(user -> {
-            List<MetaNode> metaNodes = new ArrayList<>();
+    public CompletableFuture<Home> getHome(UUID uuid, String name) {
+        return luckPerms.getUserManager().loadUser(uuid).thenApplyAsync(user -> {
             MetaNode node = user.getNodes(NodeType.META).stream()
                     .filter(mn -> mn.getMetaKey().equals("home:" + name))
                     .findFirst().orElseThrow();
             return fromHomeString(uuid, node.getMetaValue());
         });
-        return homeFuture.join();
     }
 
     public CompletableFuture<List<String>> getHomes(UUID uuid) {

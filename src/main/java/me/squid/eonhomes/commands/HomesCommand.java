@@ -3,6 +3,8 @@ package me.squid.eonhomes.commands;
 import me.squid.eonhomes.EonHomes;
 import me.squid.eonhomes.managers.HomeManager;
 import me.squid.eonhomes.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,6 +40,19 @@ public class HomesCommand implements CommandExecutor {
                         p.sendMessage(Utils.chat(EonHomes.prefix + "&7Homes: &b" + hString));
                     }
                 });
+            } else if (args.length == 1) {
+                OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[0]);
+                if (target != null) {
+                    CompletableFuture<List<String>> homesFuture = homeManager.getHomes(target.getUniqueId());
+                    homesFuture.thenAcceptAsync(homes -> {
+                        if (homes.size() == 0) {
+                            p.sendMessage(Utils.chat(EonHomes.prefix + "&7This player does not have any homes."));
+                        } else {
+                            String hString = getFormattedString(homes);
+                            p.sendMessage(Utils.chat(EonHomes.prefix + "&7" + target.getName() + " homes: &b" + hString));
+                        }
+                    });
+                } else p.sendMessage(Utils.chat(EonHomes.prefix + "&7Player does not exist"));
             }
         }
         return true;
